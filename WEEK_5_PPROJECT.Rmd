@@ -1,0 +1,79 @@
+---
+title: "week_5_project"
+author: "sahrash fatima Lab"
+date: "2024-09-27"
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
+---
+
+```{r}
+# This will open a file dialog for you to select the CSV file
+df <- read.csv(file.choose())
+
+# View the first few rows to confirm the data is loaded
+head(df)
+```
+#NORMAL DISTRIBUTION
+
+```{r}
+mean_updrs <- mean(df$UPDRS, na.rm = TRUE)
+sd_updrs <- sd(df$UPDRS, na.rm = TRUE)
+pnorm(90, mean = mean_updrs, sd = sd_updrs)
+
+```
+BINOMIAL DISTRIBUTION
+
+```{r}
+pnorm(90, mean = mean_updrs, sd = sd_updrs, lower.tail = FALSE)
+qnorm(0.841, mean = mean_updrs, sd = sd_updrs)
+
+```
+#POISSON DISTRUBUTION
+
+```{r}
+lambda_tremor <- mean(df$Tremor, na.rm = TRUE)
+dpois(7, lambda = lambda_tremor)
+ppois(7, lambda = lambda_tremor)
+ppois(7, lambda = lambda_tremor, lower.tail = FALSE)
+
+```
+#BINOMIAL DISTRIBUTION
+
+```{r}
+pbinom(10, size = 100, prob = 0.2) - dbinom(0, 100, 0.2)
+pbinom(10, size = 100, prob = 0.2)
+
+```
+#ALTERNATIVE CODE: 
+```{r}
+# Find quantile for a cumulative probability of 0.841 for UPDRS
+pnorm_value <- 0.841
+qnorm(pnorm_value, mean = mean_updrs, sd = sd_updrs)
+# Sort UPDRS values and manually get the 84.1% quantile
+sorted_updrs <- sort(df$UPDRS, na.last = TRUE)
+index_841 <- floor(0.841 * length(sorted_updrs))  # Find the 84.1% index
+sorted_updrs[index_841]
+# Generate cumulative distribution manually and approximate quantile
+cum_distribution <- ecdf(df$UPDRS)
+mean_updrs <- mean(df$UPDRS, na.rm = TRUE)  # Use a different variable name like 'mean_updrs'
+sd_updrs <- sd(df$UPDRS, na.rm = TRUE)
+
+# Get the quantile for the 84.1% cumulative probability
+mean_updrs
+# Calculate cumulative probabilities for UPDRS values
+cumulative_probabilities <- pnorm(df$UPDRS, mean = mean_updrs, sd = sd_updrs)
+
+# Find the index corresponding to 84.1% cumulative probability
+closest_index <- which.min(abs(cumulative_probabilities - 0.841))
+
+# The corresponding UPDRS value
+df$UPDRS[closest_index]
+
+```
+For the UPDRS a normal distribution approximation of the scores indicates that below 90 is common for almost 42% of the patients and scores of 158 or higher in the 84.1% quantile represent a more severe index.
+The Poisson distribution can be applied to the Tremor count as most of the patient records fewer tremor frequency than our recorded value where the probability of observing 7 or more tremors an hour in the dataset is minimal.
+Thus, in binomial case low probability of the event of 10 successes in 100 trials with success probability of 0.2 is to be expected due to the relative smallness of the number of successes.
+
+
