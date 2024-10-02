@@ -1,0 +1,87 @@
+---
+title: "week.5..p"
+author: "sahrash fatima Lab"
+date: "2024-10-02"
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+
+# Load the dataset from the specified path
+dataset <- read.csv("D:/iupui/2rd sem/R- stats/parkinsons_disease_data.csv")
+
+# View the first few rows of the dataset to verify it loaded correctly
+head(dataset)
+
+# Check the structure of the dataset to ensure variables are correctly loaded
+str(dataset)
+
+```
+
+```{r}
+# Install and load required packages
+if (!require(ggplot2)) install.packages("ggplot2", dependencies=TRUE)
+if (!require(psych)) install.packages("psych", dependencies=TRUE)
+if (!require(corrplot)) install.packages("corrplot", dependencies=TRUE)
+
+library(ggplot2)
+library(psych)
+library(corrplot)
+
+```
+
+
+```{r}
+# Plot distribution of variables and check for skewness
+plot_distribution <- function(variable_name, dataset) {
+  tryCatch({
+    ggplot(dataset, aes(x = !!sym(variable_name))) +
+      geom_histogram(bins = 30, fill = "blue", alpha = 0.7) +
+      labs(title = paste("Distribution of", variable_name), x = variable_name, y = "Count") +
+      theme_minimal()
+  }, error = function(e) {
+    return(paste("Error in plotting", variable_name, ":", e$message))
+  })
+}
+
+# Variables to plot (based on dataset)
+variables <- c("BMI", "UPDRS", "MoCA", "PhysicalActivity", "SystolicBP")
+
+# Loop through and plot distributions
+for (var in variables) {
+  print(plot_distribution(var, dataset))
+}
+
+# Scatter plot function with regression line
+scatter_plot_with_regression <- function(predictor, outcome, dataset) {
+  tryCatch({
+    ggplot(dataset, aes(x = !!sym(predictor), y = !!sym(outcome))) +
+      geom_point() +
+      geom_smooth(method = "lm", color = "red") +
+      labs(title = paste("Scatter Plot of", predictor, "vs", outcome),
+           x = predictor, y = outcome) +
+      theme_minimal()
+  }, error = function(e) {
+    return(paste("Error in plotting", predictor, "vs", outcome, ":", e$message))
+  })
+}
+
+# Variables to plot against UPDRS (adjust if needed)
+predictors <- c("BMI", "MoCA", "PhysicalActivity", "SystolicBP")
+outcome <- "UPDRS"
+
+# Loop through and plot
+for (var in predictors) {
+  print(scatter_plot_with_regression(var, outcome, dataset))
+}
+```
+```
+Correlations: Because the regression lines in all of the scatter plots are almost flat, it appears that none of the variables (BMI, SystolicBP, PhysicalActivity, MoCA, and Physical Activity) have a significant linear association with UPDRS.
+Distributions: Each variable's data is approximately uniform, with no significant skewness or strong trends in any direction, according to the histograms for the distributions.
